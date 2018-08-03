@@ -20,6 +20,12 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.lang.annotation.Annotation;
+
+import java.lang.reflect.Executable;
+import java.lang.reflect.Member;
+import java.lang.reflect.Parameter;
+
 import java.net.URL;
 
 import java.sql.Connection;
@@ -46,19 +52,42 @@ import javax.enterprise.inject.literal.NamedLiteral;
 
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Annotated;
+import javax.enterprise.inject.spi.AnnotatedField;
+import javax.enterprise.inject.spi.AnnotatedMember;
+import javax.enterprise.inject.spi.AnnotatedParameter;
+import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessInjectionPoint;
 import javax.enterprise.inject.spi.WithAnnotations;
+
+import javax.inject.Named;
+
+import javax.sql.DataSource;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+/**
+ * An {@link Extension} that arranges for injection points of type
+ * {@link DataSource} qualified with {@link Named} to be satisfied
+ * with {@link HikariDataSource} instances.
+ *
+ * @author <a href="https://about.me/lairdnelson"
+ * target="_parent">Laird Nelson</a>
+ *
+ * @see HikariDataSource
+ */
 public class HikariCPExtension implements Extension {
 
   private static final Pattern dataSourceNamePattern = Pattern.compile("^([^.]+)\\.dataSource\\.(.*)$");
 
   private final Map<String, Properties> masterProperties;
-  
+
+  /**
+   * Creates a new {@link HikariCPExtension}.
+   */
   public HikariCPExtension() {
     super();
     this.masterProperties = new HashMap<>();
@@ -73,6 +102,75 @@ public class HikariCPExtension implements Extension {
           for (final DataSourceDefinition dsd : dataSourceDefinitions) {
             assert dsd != null;
             this.aggregateDataSourceProperties(toProperties(dsd));
+          }
+        }
+      }
+    }
+  }
+
+  private final void processInjectionPoint(@Observes final ProcessInjectionPoint<?, ? extends DataSource> event) {
+    if (event != null) {
+      final InjectionPoint ip = event.getInjectionPoint();
+      if (ip != null) {
+        final Set<Annotation> qualifiers = ip.getQualifiers();
+        if (qualifiers != null) {
+          boolean addQualifier = true;
+          for (final Annotation qualifier : qualifiers) {
+            if (qualifier != null && Named.class.equals(qualifier.annotationType())) {
+              addQualifier = false;
+              break;
+            }
+          }
+          if (addQualifier) {
+            final Named namedLiteral;
+            final Annotated annotated = ip.getAnnotated();
+            if (annotated instanceof AnnotatedField) {
+              final Member field = ((AnnotatedField)annotated).getJavaMember();
+              assert field != null;
+              namedLiteral = NamedLiteral.of(field.getName());
+            } else if (annotated instanceof AnnotatedParameter) {
+              final AnnotatedParameter<?> annotatedParameter = (AnnotatedParameter<?>)annotated;
+
+              final AnnotatedMember<?> annotatedMember = annotatedParameter.getDeclaringCallable();
+              assert annotatedMember != null;
+              
+              final Member member = annotatedMember.getJavaMember();
+              assert member != null;
+              assert member instanceof Executable;
+              
+              final int parameterIndex = annotatedParameter.getPosition();
+              assert parameterIndex >= 0;
+              
+              final Parameter[] parameters = ((Executable)member).getParameters();
+              assert parameters != null;
+              assert parameters.length >= parameterIndex;
+              
+              final Parameter parameter = parameters[parameterIndex];
+              assert parameter != null;
+              
+              if (parameter.isNamePresent()) {
+                namedLiteral = NamedLiteral.of(parameter.getName());
+              } else {
+                namedLiteral = null;
+                throw new IllegalStateException("The parameter at index " +
+                                                parameterIndex +
+                                                " in " +
+                                                member +
+                                                " did not have a name available via reflection. " +
+                                                "Make sure you compiled its enclosing class, " +
+                                                member.getDeclaringClass().getName() +
+                                                ", with the -parameters option supplied to javac, " +
+                                                " or make use of the value() element of the " +
+                                                Named.class.getName() +
+                                                " annotation.");
+              }
+            } else {
+              namedLiteral = null;
+            }
+            if (namedLiteral != null) {
+              event.configureInjectionPoint()
+                .addQualifier(namedLiteral);
+            }
           }
         }
       }
