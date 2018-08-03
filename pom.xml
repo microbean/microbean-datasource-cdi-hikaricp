@@ -74,7 +74,7 @@
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>2.7.8</version>
+        <version>3.2.0</version>
         <type>jar</type>
       </dependency>
       
@@ -222,7 +222,7 @@
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
     <doctitle>&lt;a href="${project.url}" target="_parent"&gt;&lt;span style="font-family:Lobster, cursive;"&gt;µb&lt;/span&gt; ${project.artifactId}&lt;/a&gt; ${project.version} &lt;a href="https://travis-ci.org/microbean/${project.artifactId}" target="_parent"&gt;&lt;img src="https://travis-ci.org/microbean/${project.artifactId}.svg?branch=master"&gt;&lt;/a&gt;</doctitle>
-    <links>https://microbean.github.io/microbean-development-annotations/apidocs/</links>
+    <links>https://static.javadoc.io/com.zaxxer/HikariCP/3.2.0/,https://static.javadoc.io/javax.inject/javax.inject/1/,https://static.javadoc.io/javax.enterprise/cdi-api/2.0/,https://microbean.github.io/microbean-development-annotations/apidocs/</links>
     <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
     <!-- maven-project-info-reports-plugin properties; see https://maven.apache.org/plugins/maven-project-info-reports-plugin/ -->

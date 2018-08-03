@@ -358,6 +358,9 @@ public class HikariCPExtension implements Extension {
     Objects.requireNonNull(event);
     Objects.requireNonNull(name);
     Objects.requireNonNull(properties);
+    if (properties.getProperty("poolName") == null) {
+      properties.setProperty("poolName", name);
+    }    
     event.<HikariDataSource>addBean()
       .addQualifier(NamedLiteral.of(name))
       .addTransitiveTypeClosure(HikariDataSource.class)
