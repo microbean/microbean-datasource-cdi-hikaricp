@@ -366,16 +366,19 @@
 <span class="sourceLineNo">358</span>    Objects.requireNonNull(event);<a name="line.358"></a>
 <span class="sourceLineNo">359</span>    Objects.requireNonNull(name);<a name="line.359"></a>
 <span class="sourceLineNo">360</span>    Objects.requireNonNull(properties);<a name="line.360"></a>
-<span class="sourceLineNo">361</span>    event.&lt;HikariDataSource&gt;addBean()<a name="line.361"></a>
-<span class="sourceLineNo">362</span>      .addQualifier(NamedLiteral.of(name))<a name="line.362"></a>
-<span class="sourceLineNo">363</span>      .addTransitiveTypeClosure(HikariDataSource.class)<a name="line.363"></a>
-<span class="sourceLineNo">364</span>      .beanClass(HikariDataSource.class)<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      .scope(ApplicationScoped.class)<a name="line.365"></a>
-<span class="sourceLineNo">366</span>      .createWith(cc -&gt; new HikariDataSource(new HikariConfig(properties)))<a name="line.366"></a>
-<span class="sourceLineNo">367</span>      .destroyWith((dataSource, cc) -&gt; dataSource.close());<a name="line.367"></a>
-<span class="sourceLineNo">368</span>  }<a name="line.368"></a>
-<span class="sourceLineNo">369</span>  <a name="line.369"></a>
-<span class="sourceLineNo">370</span>}<a name="line.370"></a>
+<span class="sourceLineNo">361</span>    if (properties.getProperty("poolName") == null) {<a name="line.361"></a>
+<span class="sourceLineNo">362</span>      properties.setProperty("poolName", name);<a name="line.362"></a>
+<span class="sourceLineNo">363</span>    }    <a name="line.363"></a>
+<span class="sourceLineNo">364</span>    event.&lt;HikariDataSource&gt;addBean()<a name="line.364"></a>
+<span class="sourceLineNo">365</span>      .addQualifier(NamedLiteral.of(name))<a name="line.365"></a>
+<span class="sourceLineNo">366</span>      .addTransitiveTypeClosure(HikariDataSource.class)<a name="line.366"></a>
+<span class="sourceLineNo">367</span>      .beanClass(HikariDataSource.class)<a name="line.367"></a>
+<span class="sourceLineNo">368</span>      .scope(ApplicationScoped.class)<a name="line.368"></a>
+<span class="sourceLineNo">369</span>      .createWith(cc -&gt; new HikariDataSource(new HikariConfig(properties)))<a name="line.369"></a>
+<span class="sourceLineNo">370</span>      .destroyWith((dataSource, cc) -&gt; dataSource.close());<a name="line.370"></a>
+<span class="sourceLineNo">371</span>  }<a name="line.371"></a>
+<span class="sourceLineNo">372</span>  <a name="line.372"></a>
+<span class="sourceLineNo">373</span>}<a name="line.373"></a>
 
 
 
