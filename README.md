@@ -64,8 +64,9 @@ properties are processed in the manner described below.
 Properties in each `datasource.properties` file are inspected if they
 start with either `javax.sql.DataSource.` or
 `com.zaxxer.hikari.HikariDataSource.`, followed by a datasource name
-that does not contain a period ('`.`'), followed by the name of a
-[Hikari connection pool configuration setting][hikaricp-config].
+that does not contain a period ('`.`'), followed by a period ('`.`'),
+followed by the name of a [Hikari connection pool configuration
+setting][hikaricp-config].
 
 Properties are not read until all `datasource.properties` [classpath
 resources][classpath-resources] have been effectively combined together.
