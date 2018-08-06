@@ -81,7 +81,7 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 public class HikariCPExtension implements Extension {
 
-  private static final Pattern dataSourceNamePattern = Pattern.compile("^([^.]+)\\.dataSource\\.(.*)$");
+  private static final Pattern dataSourceNamePattern = Pattern.compile("^(?:javax\\.sql\\.|com\\.zaxxer\\.hikari\\.Hikari)DataSource\\.([^.]+)\\.(.*)$");
 
   private final Map<String, Properties> masterProperties;
 
