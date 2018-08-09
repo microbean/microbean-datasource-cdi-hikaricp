@@ -18,7 +18,7 @@ like this:
       <groupId>org.microbean</groupId>
       <artifactId>microbean-datasource-cdi-hikaricp</artifactId>
       <!-- See http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.microbean%22%20AND%20a%3A%22microbean-datasource-cdi-hikaricp%22 for available releases. -->
-      <version>0.0.1</version>
+      <version>0.1.1</version>
       <type>jar</type>
       <scope>runtime</scope>
     </dependency>

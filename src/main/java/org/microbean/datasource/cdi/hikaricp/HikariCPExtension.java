@@ -215,6 +215,20 @@ public class HikariCPExtension implements Extension {
     final Properties returnValue = new Properties();
     final String dataSourceName = dsd.name();
 
+    final String[] properties = dsd.properties();
+    assert properties != null;
+    for (final String propertyString : properties) {
+      assert propertyString != null;
+      final int equalsIndex = propertyString.indexOf('=');
+      if (equalsIndex > 0 && equalsIndex < propertyString.length()) {
+        final String name = propertyString.substring(0, equalsIndex);
+        assert name != null;
+        final String value = propertyString.substring(equalsIndex + 1);
+        assert value != null;
+        returnValue.setProperty(dataSourceName + ".dataSource.dataSource." + name, value);
+      }
+    }
+    
     // See https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby.
     
     returnValue.setProperty(dataSourceName + ".dataSource.dataSourceClassName", dsd.className());
@@ -223,7 +237,7 @@ public class HikariCPExtension implements Extension {
 
     // maxStatements -> (ignored)
 
-    // transactional -> (ignored)
+    // transactional -> (ignored, I guess, until I figure out what to do about XA)
 
     // minPoolSize -> minimumIdle 
     final int minPoolSize = dsd.minPoolSize();
