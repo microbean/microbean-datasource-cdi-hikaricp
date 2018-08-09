@@ -223,162 +223,176 @@
 <span class="sourceLineNo">215</span>    final Properties returnValue = new Properties();<a name="line.215"></a>
 <span class="sourceLineNo">216</span>    final String dataSourceName = dsd.name();<a name="line.216"></a>
 <span class="sourceLineNo">217</span><a name="line.217"></a>
-<span class="sourceLineNo">218</span>    // See https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby.<a name="line.218"></a>
-<span class="sourceLineNo">219</span>    <a name="line.219"></a>
-<span class="sourceLineNo">220</span>    returnValue.setProperty(dataSourceName + ".dataSource.dataSourceClassName", dsd.className());<a name="line.220"></a>
-<span class="sourceLineNo">221</span><a name="line.221"></a>
-<span class="sourceLineNo">222</span>    // initialPoolSize -&gt; (ignored)<a name="line.222"></a>
-<span class="sourceLineNo">223</span><a name="line.223"></a>
-<span class="sourceLineNo">224</span>    // maxStatements -&gt; (ignored)<a name="line.224"></a>
-<span class="sourceLineNo">225</span><a name="line.225"></a>
-<span class="sourceLineNo">226</span>    // transactional -&gt; (ignored)<a name="line.226"></a>
-<span class="sourceLineNo">227</span><a name="line.227"></a>
-<span class="sourceLineNo">228</span>    // minPoolSize -&gt; minimumIdle <a name="line.228"></a>
-<span class="sourceLineNo">229</span>    final int minPoolSize = dsd.minPoolSize();<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    if (minPoolSize &gt;= 0) {<a name="line.230"></a>
-<span class="sourceLineNo">231</span>      returnValue.setProperty(dataSourceName + ".dataSource.minimumIdle", String.valueOf(minPoolSize));<a name="line.231"></a>
-<span class="sourceLineNo">232</span>    }<a name="line.232"></a>
-<span class="sourceLineNo">233</span><a name="line.233"></a>
-<span class="sourceLineNo">234</span>    // maxPoolSize -&gt; maximumPoolSize<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    final int maxPoolSize = dsd.maxPoolSize();<a name="line.235"></a>
-<span class="sourceLineNo">236</span>    if (maxPoolSize &gt;= 0) {<a name="line.236"></a>
-<span class="sourceLineNo">237</span>      returnValue.setProperty(dataSourceName + ".dataSource.maximumPoolSize", String.valueOf(maxPoolSize));<a name="line.237"></a>
-<span class="sourceLineNo">238</span>    }<a name="line.238"></a>
+<span class="sourceLineNo">218</span>    final String[] properties = dsd.properties();<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    assert properties != null;<a name="line.219"></a>
+<span class="sourceLineNo">220</span>    for (final String propertyString : properties) {<a name="line.220"></a>
+<span class="sourceLineNo">221</span>      assert propertyString != null;<a name="line.221"></a>
+<span class="sourceLineNo">222</span>      final int equalsIndex = propertyString.indexOf('=');<a name="line.222"></a>
+<span class="sourceLineNo">223</span>      if (equalsIndex &gt; 0 &amp;&amp; equalsIndex &lt; propertyString.length()) {<a name="line.223"></a>
+<span class="sourceLineNo">224</span>        final String name = propertyString.substring(0, equalsIndex);<a name="line.224"></a>
+<span class="sourceLineNo">225</span>        assert name != null;<a name="line.225"></a>
+<span class="sourceLineNo">226</span>        final String value = propertyString.substring(equalsIndex + 1);<a name="line.226"></a>
+<span class="sourceLineNo">227</span>        assert value != null;<a name="line.227"></a>
+<span class="sourceLineNo">228</span>        returnValue.setProperty(dataSourceName + ".dataSource.dataSource." + name, value);<a name="line.228"></a>
+<span class="sourceLineNo">229</span>      }<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    }<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    <a name="line.231"></a>
+<span class="sourceLineNo">232</span>    // See https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    <a name="line.233"></a>
+<span class="sourceLineNo">234</span>    returnValue.setProperty(dataSourceName + ".dataSource.dataSourceClassName", dsd.className());<a name="line.234"></a>
+<span class="sourceLineNo">235</span><a name="line.235"></a>
+<span class="sourceLineNo">236</span>    // initialPoolSize -&gt; (ignored)<a name="line.236"></a>
+<span class="sourceLineNo">237</span><a name="line.237"></a>
+<span class="sourceLineNo">238</span>    // maxStatements -&gt; (ignored)<a name="line.238"></a>
 <span class="sourceLineNo">239</span><a name="line.239"></a>
-<span class="sourceLineNo">240</span>    // loginTimeout -&gt; connectionTimeout<a name="line.240"></a>
-<span class="sourceLineNo">241</span>    final int loginTimeout = dsd.loginTimeout();<a name="line.241"></a>
-<span class="sourceLineNo">242</span>    if (loginTimeout &gt; 0) {<a name="line.242"></a>
-<span class="sourceLineNo">243</span>      returnValue.setProperty(dataSourceName + ".dataSource.connectionTimeout", String.valueOf(loginTimeout));<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    }<a name="line.244"></a>
-<span class="sourceLineNo">245</span><a name="line.245"></a>
-<span class="sourceLineNo">246</span>    // maxIdleTime -&gt; idleTimeout<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    final int maxIdleTime = dsd.maxIdleTime();<a name="line.247"></a>
-<span class="sourceLineNo">248</span>    if (maxIdleTime &gt;= 0) {<a name="line.248"></a>
-<span class="sourceLineNo">249</span>      returnValue.setProperty(dataSourceName + ".dataSource.idleTimeout", String.valueOf(maxIdleTime));<a name="line.249"></a>
-<span class="sourceLineNo">250</span>    }<a name="line.250"></a>
-<span class="sourceLineNo">251</span><a name="line.251"></a>
-<span class="sourceLineNo">252</span>    // password -&gt; password<a name="line.252"></a>
-<span class="sourceLineNo">253</span>    //<a name="line.253"></a>
-<span class="sourceLineNo">254</span>    // Note: *not* dataSource.password<a name="line.254"></a>
-<span class="sourceLineNo">255</span>    final String password = dsd.password();<a name="line.255"></a>
-<span class="sourceLineNo">256</span>    assert password != null;<a name="line.256"></a>
-<span class="sourceLineNo">257</span>    if (!password.isEmpty()) {<a name="line.257"></a>
-<span class="sourceLineNo">258</span>      returnValue.setProperty(dataSourceName + ".dataSource.password", password);<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    }<a name="line.259"></a>
-<span class="sourceLineNo">260</span><a name="line.260"></a>
-<span class="sourceLineNo">261</span>    // isolationLevel -&gt; transactionIsolation<a name="line.261"></a>
-<span class="sourceLineNo">262</span>    final int isolationLevel = dsd.isolationLevel();    <a name="line.262"></a>
-<span class="sourceLineNo">263</span>    if (isolationLevel &gt;= 0) {<a name="line.263"></a>
-<span class="sourceLineNo">264</span>      final String propertyValue;<a name="line.264"></a>
-<span class="sourceLineNo">265</span>      switch (isolationLevel) {<a name="line.265"></a>
-<span class="sourceLineNo">266</span>      case Connection.TRANSACTION_NONE:<a name="line.266"></a>
-<span class="sourceLineNo">267</span>        propertyValue = "TRANSACTION_NONE";<a name="line.267"></a>
-<span class="sourceLineNo">268</span>        break;<a name="line.268"></a>
-<span class="sourceLineNo">269</span>      case Connection.TRANSACTION_READ_UNCOMMITTED:<a name="line.269"></a>
-<span class="sourceLineNo">270</span>        propertyValue = "TRANSACTION_READ_UNCOMMITTED";<a name="line.270"></a>
-<span class="sourceLineNo">271</span>        break;<a name="line.271"></a>
-<span class="sourceLineNo">272</span>      case Connection.TRANSACTION_READ_COMMITTED:<a name="line.272"></a>
-<span class="sourceLineNo">273</span>        propertyValue = "TRANSACTION_READ_COMMITTED";<a name="line.273"></a>
-<span class="sourceLineNo">274</span>        break;<a name="line.274"></a>
-<span class="sourceLineNo">275</span>      case Connection.TRANSACTION_REPEATABLE_READ:<a name="line.275"></a>
-<span class="sourceLineNo">276</span>        propertyValue = "TRANSACTION_REPEATABLE_READ";<a name="line.276"></a>
-<span class="sourceLineNo">277</span>        break;<a name="line.277"></a>
-<span class="sourceLineNo">278</span>      case Connection.TRANSACTION_SERIALIZABLE:<a name="line.278"></a>
-<span class="sourceLineNo">279</span>        propertyValue = "TRANSACTION_SERIALIZABLE";<a name="line.279"></a>
-<span class="sourceLineNo">280</span>        break;<a name="line.280"></a>
-<span class="sourceLineNo">281</span>      default:<a name="line.281"></a>
-<span class="sourceLineNo">282</span>        propertyValue = null;<a name="line.282"></a>
-<span class="sourceLineNo">283</span>        throw new IllegalStateException("Unexpected isolation level: " + isolationLevel);<a name="line.283"></a>
-<span class="sourceLineNo">284</span>      }<a name="line.284"></a>
-<span class="sourceLineNo">285</span>      returnValue.setProperty(dataSourceName + ".dataSource.transactionIsolation", propertyValue);<a name="line.285"></a>
-<span class="sourceLineNo">286</span>    }<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    <a name="line.287"></a>
-<span class="sourceLineNo">288</span>    // user -&gt; dataSource.username<a name="line.288"></a>
-<span class="sourceLineNo">289</span>    //<a name="line.289"></a>
-<span class="sourceLineNo">290</span>    // This one's a bit odd.  Note that this does NOT map to<a name="line.290"></a>
-<span class="sourceLineNo">291</span>    // dataSource.user!<a name="line.291"></a>
-<span class="sourceLineNo">292</span>    final String user = dsd.user();<a name="line.292"></a>
-<span class="sourceLineNo">293</span>    assert user != null;<a name="line.293"></a>
-<span class="sourceLineNo">294</span>    if (!user.isEmpty()) {<a name="line.294"></a>
-<span class="sourceLineNo">295</span>      returnValue.setProperty(dataSourceName + ".dataSource.username", user);<a name="line.295"></a>
-<span class="sourceLineNo">296</span>    }<a name="line.296"></a>
-<span class="sourceLineNo">297</span>    <a name="line.297"></a>
-<span class="sourceLineNo">298</span>    // databaseName -&gt; dataSource.databaseName (standard DataSource property)<a name="line.298"></a>
-<span class="sourceLineNo">299</span>    final String databaseName = dsd.databaseName();<a name="line.299"></a>
-<span class="sourceLineNo">300</span>    assert databaseName != null;<a name="line.300"></a>
-<span class="sourceLineNo">301</span>    if (!databaseName.isEmpty()) {<a name="line.301"></a>
-<span class="sourceLineNo">302</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.databaseName", databaseName);<a name="line.302"></a>
-<span class="sourceLineNo">303</span>    }<a name="line.303"></a>
-<span class="sourceLineNo">304</span><a name="line.304"></a>
-<span class="sourceLineNo">305</span>    // description -&gt; dataSource.description (standard DataSource property)<a name="line.305"></a>
-<span class="sourceLineNo">306</span>    final String description = dsd.description();<a name="line.306"></a>
-<span class="sourceLineNo">307</span>    assert description != null;<a name="line.307"></a>
-<span class="sourceLineNo">308</span>    if (!description.isEmpty()) {<a name="line.308"></a>
-<span class="sourceLineNo">309</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.description", description);<a name="line.309"></a>
+<span class="sourceLineNo">240</span>    // transactional -&gt; (ignored, I guess, until I figure out what to do about XA)<a name="line.240"></a>
+<span class="sourceLineNo">241</span><a name="line.241"></a>
+<span class="sourceLineNo">242</span>    // minPoolSize -&gt; minimumIdle <a name="line.242"></a>
+<span class="sourceLineNo">243</span>    final int minPoolSize = dsd.minPoolSize();<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    if (minPoolSize &gt;= 0) {<a name="line.244"></a>
+<span class="sourceLineNo">245</span>      returnValue.setProperty(dataSourceName + ".dataSource.minimumIdle", String.valueOf(minPoolSize));<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    }<a name="line.246"></a>
+<span class="sourceLineNo">247</span><a name="line.247"></a>
+<span class="sourceLineNo">248</span>    // maxPoolSize -&gt; maximumPoolSize<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    final int maxPoolSize = dsd.maxPoolSize();<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    if (maxPoolSize &gt;= 0) {<a name="line.250"></a>
+<span class="sourceLineNo">251</span>      returnValue.setProperty(dataSourceName + ".dataSource.maximumPoolSize", String.valueOf(maxPoolSize));<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    }<a name="line.252"></a>
+<span class="sourceLineNo">253</span><a name="line.253"></a>
+<span class="sourceLineNo">254</span>    // loginTimeout -&gt; connectionTimeout<a name="line.254"></a>
+<span class="sourceLineNo">255</span>    final int loginTimeout = dsd.loginTimeout();<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    if (loginTimeout &gt; 0) {<a name="line.256"></a>
+<span class="sourceLineNo">257</span>      returnValue.setProperty(dataSourceName + ".dataSource.connectionTimeout", String.valueOf(loginTimeout));<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    }<a name="line.258"></a>
+<span class="sourceLineNo">259</span><a name="line.259"></a>
+<span class="sourceLineNo">260</span>    // maxIdleTime -&gt; idleTimeout<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    final int maxIdleTime = dsd.maxIdleTime();<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    if (maxIdleTime &gt;= 0) {<a name="line.262"></a>
+<span class="sourceLineNo">263</span>      returnValue.setProperty(dataSourceName + ".dataSource.idleTimeout", String.valueOf(maxIdleTime));<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    }<a name="line.264"></a>
+<span class="sourceLineNo">265</span><a name="line.265"></a>
+<span class="sourceLineNo">266</span>    // password -&gt; password<a name="line.266"></a>
+<span class="sourceLineNo">267</span>    //<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    // Note: *not* dataSource.password<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    final String password = dsd.password();<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    assert password != null;<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    if (!password.isEmpty()) {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>      returnValue.setProperty(dataSourceName + ".dataSource.password", password);<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    }<a name="line.273"></a>
+<span class="sourceLineNo">274</span><a name="line.274"></a>
+<span class="sourceLineNo">275</span>    // isolationLevel -&gt; transactionIsolation<a name="line.275"></a>
+<span class="sourceLineNo">276</span>    final int isolationLevel = dsd.isolationLevel();    <a name="line.276"></a>
+<span class="sourceLineNo">277</span>    if (isolationLevel &gt;= 0) {<a name="line.277"></a>
+<span class="sourceLineNo">278</span>      final String propertyValue;<a name="line.278"></a>
+<span class="sourceLineNo">279</span>      switch (isolationLevel) {<a name="line.279"></a>
+<span class="sourceLineNo">280</span>      case Connection.TRANSACTION_NONE:<a name="line.280"></a>
+<span class="sourceLineNo">281</span>        propertyValue = "TRANSACTION_NONE";<a name="line.281"></a>
+<span class="sourceLineNo">282</span>        break;<a name="line.282"></a>
+<span class="sourceLineNo">283</span>      case Connection.TRANSACTION_READ_UNCOMMITTED:<a name="line.283"></a>
+<span class="sourceLineNo">284</span>        propertyValue = "TRANSACTION_READ_UNCOMMITTED";<a name="line.284"></a>
+<span class="sourceLineNo">285</span>        break;<a name="line.285"></a>
+<span class="sourceLineNo">286</span>      case Connection.TRANSACTION_READ_COMMITTED:<a name="line.286"></a>
+<span class="sourceLineNo">287</span>        propertyValue = "TRANSACTION_READ_COMMITTED";<a name="line.287"></a>
+<span class="sourceLineNo">288</span>        break;<a name="line.288"></a>
+<span class="sourceLineNo">289</span>      case Connection.TRANSACTION_REPEATABLE_READ:<a name="line.289"></a>
+<span class="sourceLineNo">290</span>        propertyValue = "TRANSACTION_REPEATABLE_READ";<a name="line.290"></a>
+<span class="sourceLineNo">291</span>        break;<a name="line.291"></a>
+<span class="sourceLineNo">292</span>      case Connection.TRANSACTION_SERIALIZABLE:<a name="line.292"></a>
+<span class="sourceLineNo">293</span>        propertyValue = "TRANSACTION_SERIALIZABLE";<a name="line.293"></a>
+<span class="sourceLineNo">294</span>        break;<a name="line.294"></a>
+<span class="sourceLineNo">295</span>      default:<a name="line.295"></a>
+<span class="sourceLineNo">296</span>        propertyValue = null;<a name="line.296"></a>
+<span class="sourceLineNo">297</span>        throw new IllegalStateException("Unexpected isolation level: " + isolationLevel);<a name="line.297"></a>
+<span class="sourceLineNo">298</span>      }<a name="line.298"></a>
+<span class="sourceLineNo">299</span>      returnValue.setProperty(dataSourceName + ".dataSource.transactionIsolation", propertyValue);<a name="line.299"></a>
+<span class="sourceLineNo">300</span>    }<a name="line.300"></a>
+<span class="sourceLineNo">301</span>    <a name="line.301"></a>
+<span class="sourceLineNo">302</span>    // user -&gt; dataSource.username<a name="line.302"></a>
+<span class="sourceLineNo">303</span>    //<a name="line.303"></a>
+<span class="sourceLineNo">304</span>    // This one's a bit odd.  Note that this does NOT map to<a name="line.304"></a>
+<span class="sourceLineNo">305</span>    // dataSource.user!<a name="line.305"></a>
+<span class="sourceLineNo">306</span>    final String user = dsd.user();<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    assert user != null;<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    if (!user.isEmpty()) {<a name="line.308"></a>
+<span class="sourceLineNo">309</span>      returnValue.setProperty(dataSourceName + ".dataSource.username", user);<a name="line.309"></a>
 <span class="sourceLineNo">310</span>    }<a name="line.310"></a>
-<span class="sourceLineNo">311</span><a name="line.311"></a>
-<span class="sourceLineNo">312</span>    // portNumber -&gt; dataSource.portNumber (standard DataSource property)<a name="line.312"></a>
-<span class="sourceLineNo">313</span>    final int portNumber = dsd.portNumber();<a name="line.313"></a>
-<span class="sourceLineNo">314</span>    if (portNumber &gt;= 0) {<a name="line.314"></a>
-<span class="sourceLineNo">315</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.portNumber", String.valueOf(portNumber));<a name="line.315"></a>
-<span class="sourceLineNo">316</span>    }<a name="line.316"></a>
-<span class="sourceLineNo">317</span>    <a name="line.317"></a>
-<span class="sourceLineNo">318</span>    // serverName -&gt; dataSource.serverName (standard DataSource property)<a name="line.318"></a>
-<span class="sourceLineNo">319</span>    final String serverName = dsd.serverName();<a name="line.319"></a>
-<span class="sourceLineNo">320</span>    assert serverName != null;<a name="line.320"></a>
-<span class="sourceLineNo">321</span>    if (!serverName.isEmpty()) {<a name="line.321"></a>
-<span class="sourceLineNo">322</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.serverName", serverName);<a name="line.322"></a>
-<span class="sourceLineNo">323</span>    }   <a name="line.323"></a>
-<span class="sourceLineNo">324</span><a name="line.324"></a>
-<span class="sourceLineNo">325</span>    // url -&gt; dataSource.url (standard DataSource property)<a name="line.325"></a>
-<span class="sourceLineNo">326</span>    final String url = dsd.url();<a name="line.326"></a>
-<span class="sourceLineNo">327</span>    assert url != null;<a name="line.327"></a>
-<span class="sourceLineNo">328</span>    if (!url.isEmpty()) {<a name="line.328"></a>
-<span class="sourceLineNo">329</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.url", url);<a name="line.329"></a>
+<span class="sourceLineNo">311</span>    <a name="line.311"></a>
+<span class="sourceLineNo">312</span>    // databaseName -&gt; dataSource.databaseName (standard DataSource property)<a name="line.312"></a>
+<span class="sourceLineNo">313</span>    final String databaseName = dsd.databaseName();<a name="line.313"></a>
+<span class="sourceLineNo">314</span>    assert databaseName != null;<a name="line.314"></a>
+<span class="sourceLineNo">315</span>    if (!databaseName.isEmpty()) {<a name="line.315"></a>
+<span class="sourceLineNo">316</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.databaseName", databaseName);<a name="line.316"></a>
+<span class="sourceLineNo">317</span>    }<a name="line.317"></a>
+<span class="sourceLineNo">318</span><a name="line.318"></a>
+<span class="sourceLineNo">319</span>    // description -&gt; dataSource.description (standard DataSource property)<a name="line.319"></a>
+<span class="sourceLineNo">320</span>    final String description = dsd.description();<a name="line.320"></a>
+<span class="sourceLineNo">321</span>    assert description != null;<a name="line.321"></a>
+<span class="sourceLineNo">322</span>    if (!description.isEmpty()) {<a name="line.322"></a>
+<span class="sourceLineNo">323</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.description", description);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>    }<a name="line.324"></a>
+<span class="sourceLineNo">325</span><a name="line.325"></a>
+<span class="sourceLineNo">326</span>    // portNumber -&gt; dataSource.portNumber (standard DataSource property)<a name="line.326"></a>
+<span class="sourceLineNo">327</span>    final int portNumber = dsd.portNumber();<a name="line.327"></a>
+<span class="sourceLineNo">328</span>    if (portNumber &gt;= 0) {<a name="line.328"></a>
+<span class="sourceLineNo">329</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.portNumber", String.valueOf(portNumber));<a name="line.329"></a>
 <span class="sourceLineNo">330</span>    }<a name="line.330"></a>
 <span class="sourceLineNo">331</span>    <a name="line.331"></a>
-<span class="sourceLineNo">332</span>    return returnValue;<a name="line.332"></a>
-<span class="sourceLineNo">333</span>  }<a name="line.333"></a>
-<span class="sourceLineNo">334</span>  <a name="line.334"></a>
-<span class="sourceLineNo">335</span>  private final void aggregateDataSourceProperties(final Properties dataSourceProperties) throws IOException {<a name="line.335"></a>
-<span class="sourceLineNo">336</span>    Objects.requireNonNull(dataSourceProperties);<a name="line.336"></a>
-<span class="sourceLineNo">337</span>    final Set&lt;String&gt; stringPropertyNames = dataSourceProperties.stringPropertyNames();<a name="line.337"></a>
-<span class="sourceLineNo">338</span>    if (stringPropertyNames != null &amp;&amp; !stringPropertyNames.isEmpty()) {<a name="line.338"></a>
-<span class="sourceLineNo">339</span>      for (final String name : stringPropertyNames) {<a name="line.339"></a>
-<span class="sourceLineNo">340</span>        assert name != null;<a name="line.340"></a>
-<span class="sourceLineNo">341</span>        final Matcher matcher = dataSourceNamePattern.matcher(name);<a name="line.341"></a>
-<span class="sourceLineNo">342</span>        assert matcher != null;<a name="line.342"></a>
-<span class="sourceLineNo">343</span>        if (matcher.matches()) {<a name="line.343"></a>
-<span class="sourceLineNo">344</span>          final String dataSourceName = matcher.group(1);<a name="line.344"></a>
-<span class="sourceLineNo">345</span>          final String dataSourceProperty = matcher.group(2);<a name="line.345"></a>
-<span class="sourceLineNo">346</span>          Properties relevantProperties = this.masterProperties.get(dataSourceName);<a name="line.346"></a>
-<span class="sourceLineNo">347</span>          if (relevantProperties == null) {<a name="line.347"></a>
-<span class="sourceLineNo">348</span>            relevantProperties = new Properties();<a name="line.348"></a>
-<span class="sourceLineNo">349</span>            this.masterProperties.put(dataSourceName, relevantProperties);<a name="line.349"></a>
-<span class="sourceLineNo">350</span>          }<a name="line.350"></a>
-<span class="sourceLineNo">351</span>          relevantProperties.setProperty(dataSourceProperty, dataSourceProperties.getProperty(name));<a name="line.351"></a>
-<span class="sourceLineNo">352</span>        }        <a name="line.352"></a>
-<span class="sourceLineNo">353</span>      }<a name="line.353"></a>
-<span class="sourceLineNo">354</span>    }<a name="line.354"></a>
-<span class="sourceLineNo">355</span>  }<a name="line.355"></a>
-<span class="sourceLineNo">356</span><a name="line.356"></a>
-<span class="sourceLineNo">357</span>  private final void addBean(final AfterBeanDiscovery event, final String name, final Properties properties) {<a name="line.357"></a>
-<span class="sourceLineNo">358</span>    Objects.requireNonNull(event);<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    Objects.requireNonNull(name);<a name="line.359"></a>
-<span class="sourceLineNo">360</span>    Objects.requireNonNull(properties);<a name="line.360"></a>
-<span class="sourceLineNo">361</span>    if (properties.getProperty("poolName") == null) {<a name="line.361"></a>
-<span class="sourceLineNo">362</span>      properties.setProperty("poolName", name);<a name="line.362"></a>
-<span class="sourceLineNo">363</span>    }    <a name="line.363"></a>
-<span class="sourceLineNo">364</span>    event.&lt;HikariDataSource&gt;addBean()<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      .addQualifier(NamedLiteral.of(name))<a name="line.365"></a>
-<span class="sourceLineNo">366</span>      .addTransitiveTypeClosure(HikariDataSource.class)<a name="line.366"></a>
-<span class="sourceLineNo">367</span>      .beanClass(HikariDataSource.class)<a name="line.367"></a>
-<span class="sourceLineNo">368</span>      .scope(ApplicationScoped.class)<a name="line.368"></a>
-<span class="sourceLineNo">369</span>      .createWith(cc -&gt; new HikariDataSource(new HikariConfig(properties)))<a name="line.369"></a>
-<span class="sourceLineNo">370</span>      .destroyWith((dataSource, cc) -&gt; dataSource.close());<a name="line.370"></a>
-<span class="sourceLineNo">371</span>  }<a name="line.371"></a>
-<span class="sourceLineNo">372</span>  <a name="line.372"></a>
-<span class="sourceLineNo">373</span>}<a name="line.373"></a>
+<span class="sourceLineNo">332</span>    // serverName -&gt; dataSource.serverName (standard DataSource property)<a name="line.332"></a>
+<span class="sourceLineNo">333</span>    final String serverName = dsd.serverName();<a name="line.333"></a>
+<span class="sourceLineNo">334</span>    assert serverName != null;<a name="line.334"></a>
+<span class="sourceLineNo">335</span>    if (!serverName.isEmpty()) {<a name="line.335"></a>
+<span class="sourceLineNo">336</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.serverName", serverName);<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    }   <a name="line.337"></a>
+<span class="sourceLineNo">338</span><a name="line.338"></a>
+<span class="sourceLineNo">339</span>    // url -&gt; dataSource.url (standard DataSource property)<a name="line.339"></a>
+<span class="sourceLineNo">340</span>    final String url = dsd.url();<a name="line.340"></a>
+<span class="sourceLineNo">341</span>    assert url != null;<a name="line.341"></a>
+<span class="sourceLineNo">342</span>    if (!url.isEmpty()) {<a name="line.342"></a>
+<span class="sourceLineNo">343</span>      returnValue.setProperty(dataSourceName + ".dataSource.dataSource.url", url);<a name="line.343"></a>
+<span class="sourceLineNo">344</span>    }<a name="line.344"></a>
+<span class="sourceLineNo">345</span>    <a name="line.345"></a>
+<span class="sourceLineNo">346</span>    return returnValue;<a name="line.346"></a>
+<span class="sourceLineNo">347</span>  }<a name="line.347"></a>
+<span class="sourceLineNo">348</span>  <a name="line.348"></a>
+<span class="sourceLineNo">349</span>  private final void aggregateDataSourceProperties(final Properties dataSourceProperties) throws IOException {<a name="line.349"></a>
+<span class="sourceLineNo">350</span>    Objects.requireNonNull(dataSourceProperties);<a name="line.350"></a>
+<span class="sourceLineNo">351</span>    final Set&lt;String&gt; stringPropertyNames = dataSourceProperties.stringPropertyNames();<a name="line.351"></a>
+<span class="sourceLineNo">352</span>    if (stringPropertyNames != null &amp;&amp; !stringPropertyNames.isEmpty()) {<a name="line.352"></a>
+<span class="sourceLineNo">353</span>      for (final String name : stringPropertyNames) {<a name="line.353"></a>
+<span class="sourceLineNo">354</span>        assert name != null;<a name="line.354"></a>
+<span class="sourceLineNo">355</span>        final Matcher matcher = dataSourceNamePattern.matcher(name);<a name="line.355"></a>
+<span class="sourceLineNo">356</span>        assert matcher != null;<a name="line.356"></a>
+<span class="sourceLineNo">357</span>        if (matcher.matches()) {<a name="line.357"></a>
+<span class="sourceLineNo">358</span>          final String dataSourceName = matcher.group(1);<a name="line.358"></a>
+<span class="sourceLineNo">359</span>          final String dataSourceProperty = matcher.group(2);<a name="line.359"></a>
+<span class="sourceLineNo">360</span>          Properties relevantProperties = this.masterProperties.get(dataSourceName);<a name="line.360"></a>
+<span class="sourceLineNo">361</span>          if (relevantProperties == null) {<a name="line.361"></a>
+<span class="sourceLineNo">362</span>            relevantProperties = new Properties();<a name="line.362"></a>
+<span class="sourceLineNo">363</span>            this.masterProperties.put(dataSourceName, relevantProperties);<a name="line.363"></a>
+<span class="sourceLineNo">364</span>          }<a name="line.364"></a>
+<span class="sourceLineNo">365</span>          relevantProperties.setProperty(dataSourceProperty, dataSourceProperties.getProperty(name));<a name="line.365"></a>
+<span class="sourceLineNo">366</span>        }        <a name="line.366"></a>
+<span class="sourceLineNo">367</span>      }<a name="line.367"></a>
+<span class="sourceLineNo">368</span>    }<a name="line.368"></a>
+<span class="sourceLineNo">369</span>  }<a name="line.369"></a>
+<span class="sourceLineNo">370</span><a name="line.370"></a>
+<span class="sourceLineNo">371</span>  private final void addBean(final AfterBeanDiscovery event, final String name, final Properties properties) {<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    Objects.requireNonNull(event);<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    Objects.requireNonNull(name);<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    Objects.requireNonNull(properties);<a name="line.374"></a>
+<span class="sourceLineNo">375</span>    if (properties.getProperty("poolName") == null) {<a name="line.375"></a>
+<span class="sourceLineNo">376</span>      properties.setProperty("poolName", name);<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    }    <a name="line.377"></a>
+<span class="sourceLineNo">378</span>    event.&lt;HikariDataSource&gt;addBean()<a name="line.378"></a>
+<span class="sourceLineNo">379</span>      .addQualifier(NamedLiteral.of(name))<a name="line.379"></a>
+<span class="sourceLineNo">380</span>      .addTransitiveTypeClosure(HikariDataSource.class)<a name="line.380"></a>
+<span class="sourceLineNo">381</span>      .beanClass(HikariDataSource.class)<a name="line.381"></a>
+<span class="sourceLineNo">382</span>      .scope(ApplicationScoped.class)<a name="line.382"></a>
+<span class="sourceLineNo">383</span>      .createWith(cc -&gt; new HikariDataSource(new HikariConfig(properties)))<a name="line.383"></a>
+<span class="sourceLineNo">384</span>      .destroyWith((dataSource, cc) -&gt; dataSource.close());<a name="line.384"></a>
+<span class="sourceLineNo">385</span>  }<a name="line.385"></a>
+<span class="sourceLineNo">386</span>  <a name="line.386"></a>
+<span class="sourceLineNo">387</span>}<a name="line.387"></a>
 
 
 
