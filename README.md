@@ -1,15 +1,15 @@
-# microBean Hikari Connection Pool CDI Integration
+# microBean Hikari Connection Pool CDI Extension
 
 [![Build Status](https://travis-ci.org/microbean/microbean-datasource-cdi-hikaricp.svg?branch=master)](https://travis-ci.org/microbean/microbean-datasource-cdi-hikaricp)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-datasource-cdi-hikaricp/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.microbean/microbean-datasource-cdi-hikaricp)
 
-The microBean Hikari Connection Pool CDI Integration project
+The microBean Hikari Connection Pool CDI Extension project
 integrates the [Hikari connection pool][hikaricp] into [CDI 2.0 SE
 environments][cdi].
 
 # Installation
 
-To install the microBean Hikari Connection Pool CDI Integration
+To install the microBean Hikari Connection Pool CDI Extension
 project, ensure that it and its dependencies are present on the
 classpath at runtime.  In Maven, your dependency stanza should look
 like this:
@@ -31,7 +31,7 @@ well at runtime.
 
 # Usage
 
-The microBean Hikari Connection Pool CDI Integration project works,
+The microBean Hikari Connection Pool CDI Extension project works,
 essentially, by satisfying `DataSource` injection points.  That is, in
 your [CDI 2.0 SE][cdi] application somewhere, if you do:
 
@@ -51,7 +51,7 @@ by the Hikari connection pool][hikari-datasource] to be assigned to
 this `orders` field in [application scope][application-scope].
 
 For such injection points to be satisfied, the microBean Hikari
-Connection Pool CDI Integration project needs to understand how to
+Connection Pool CDI Extension project needs to understand how to
 configure any particular named `DataSource` implementation that will
 be injected.  To do this, it looks for [`DataSourceDefinition`][dsd]
 annotations and `datasource.properties` classpath resources.
