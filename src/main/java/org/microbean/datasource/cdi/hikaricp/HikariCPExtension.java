@@ -108,7 +108,7 @@ public class HikariCPExtension implements Extension {
     }
   }
 
-  private final void processInjectionPoint(@Observes final ProcessInjectionPoint<?, ? extends DataSource> event) {
+  private final <T extends DataSource> void processInjectionPoint(@Observes final ProcessInjectionPoint<?, T> event) {
     if (event != null) {
       final InjectionPoint ip = event.getInjectionPoint();
       if (ip != null) {

@@ -7,4 +7,12 @@
     <gav regex="true">^javax\.el:javax\.el-api:.*$</gav>
     <cpe>cpe:/a:oracle:glassfish</cpe>
   </suppress>
+
+  <suppress>
+    <notes><![CDATA[
+    file name: slf4j-api-1.8.0-beta2.jar
+    ]]></notes>
+    <gav regex="true">^org\.slf4j:slf4j-api:.*$</gav>
+    <cpe>cpe:/a:slf4j:slf4j</cpe>
+  </suppress>
 </suppressions>
